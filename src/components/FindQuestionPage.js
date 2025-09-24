@@ -2,8 +2,8 @@
 // This component allows users to search and filter questions from the database.
 // It fetches questions from Firebase Firestore and displays them, updating in real-time.
 import React, { useState, useEffect } from 'react';
-import { Container, Header, Input, Dropdown, Grid, Button, Segment, Message, Icon, Statistic } from 'semantic-ui-react';
-import { collection, getDocs, orderBy, query, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { Container, Header, Input, Dropdown, Grid, Segment, Message, Statistic } from 'semantic-ui-react';
+import { collection, orderBy, query, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import QuestionCard from './QuestionCard';
 

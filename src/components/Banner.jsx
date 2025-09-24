@@ -3,8 +3,7 @@ import { faker } from '@faker-js/faker';
 
 
 const Banner = () => {
-  // Use faker for random title and description
-  const title = faker.company.catchPhrase();
+  // Use faker for random description
   const description = faker.lorem.sentence();
   // Use picsum.photos for a random banner image
   const imageUrl = `https://picsum.photos/seed/${Math.floor(Math.random()*1000)}/1200/300`;

@@ -45,7 +45,7 @@ const CheckoutForm = () => {
     const cardElement = elements.getElement(CardElement);
 
     // Create payment method with billing details
-    const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
+    const { error: stripeError } = await stripe.createPaymentMethod({
       type: 'card',
       card: cardElement,
       billing_details: {
@@ -146,7 +146,6 @@ const CheckoutForm = () => {
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const plan = location.state?.plan || 'premium';
 
   return (
     <div>
