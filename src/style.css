@@ -1,0 +1,269 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -1em;
+}
+
+.column {
+  flex: 1;
+  padding: 1em;
+}
+
+.column.small { flex: 1; }
+.column.medium { flex: 2; }
+.column.large { flex: 3; }
+
+.header {
+  background: #fff;
+  padding: 1em;
+  align-items: center;
+}
+
+.searchBox {
+  padding: 0.5em;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.banner-section {
+  margin: 20px 0;
+}
+
+.banner-image {
+  position: relative;
+  width: 100%;
+}
+
+.banner-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.coverImage {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border: 2px solid #000;
+}
+
+.articles-section, .tutorials-section {
+  margin: 40px 0;
+}
+
+.articles-section h2, .tutorials-section h2 {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.card-container {
+  border: 2px solid #000;
+  padding: 1em;
+  text-align: center;
+  margin: 10px;
+}
+
+.card-placeholder {
+  height: 150px;
+  background: #e0e0e0;
+  margin-bottom: 1em;
+  border: 1px solid #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.card-placeholder::before {
+  content: "Article Image";
+}
+
+.tutorials-section .card-placeholder::before {
+  content: "Tutorial Image";
+}
+
+.star {
+  width: 20px;
+  height: 20px;
+}
+
+.rating-author {
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.rating-author .column.small {
+  display: flex;
+  align-items: center;
+}
+
+.rating-author .column.small .row {
+  align-items: center;
+  margin: 0;
+}
+
+.rating-author .column.small .column {
+  padding: 0.2em;
+}
+
+.seeMore {
+  background: #e0e0e0;
+  border: 1px solid #999;
+  padding: 0.5em 2em;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.seeMore:hover {
+  background: #d0d0d0;
+}
+
+.subscribe-box {
+  padding: 2em;
+  text-align: center;
+  background: #f9f9f9;
+  margin: 40px 0;
+}
+
+.subscribe-text {
+  margin-bottom: 1em;
+}
+
+.subscribe-text h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.form-control {
+  padding: 0.8em;
+  margin-right: 1em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 300px;
+}
+
+button[type="submit"] {
+  background: #e0e0e0;
+  border: 1px solid #999;
+  padding: 0.8em 1.5em;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button[type="submit"]:hover {
+  background: #d0d0d0;
+}
+
+.footer {
+  background: #2c5c5c;
+  color: #fff;
+  padding: 2em 1em 1em 1em;
+  margin-top: 40px;
+}
+
+.footer h1, .footer h4 {
+  color: #fff;
+}
+
+.footer .ui.link.list a.item {
+  color: #ccc;
+}
+
+.footer .ui.link.list a.item:hover {
+  color: #fff;
+}
+
+.socialIcon {
+  width: 30px;
+  height: 30px;
+  margin: 0 0.5em;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.ui.inverted.vertical.footer.segment {
+  background: #2c5c5c !important;
+}
+
+.ui.center.aligned {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #4c7c7c;
+}
+
+.ui.horizontal.list .item {
+  margin: 0 10px;
+}
+
+.ui.horizontal.list a.item {
+  color: #ccc;
+}
+
+.ui.horizontal.list a.item:hover {
+  color: #fff;
+}
+
+/* CodeMirror styles */
+.CodeMirror {
+  height: 300px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.CodeMirror-focused .CodeMirror-cursor {
+  border-left: 1px solid #fff;
+}
+
+/* Payment form styles */
+.StripeElement {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Plans page styles */
+.plans-container {
+  padding: 2rem 0;
+}
+
+.plan-card {
+  transition: transform 0.2s;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Post creation styles */
+.post-preview {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.code-preview {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
