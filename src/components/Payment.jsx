@@ -16,7 +16,7 @@ import {
   Divider,
   Form
 } from 'semantic-ui-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 
@@ -144,7 +144,6 @@ const CheckoutForm = () => {
 };
 
 const Payment = () => {
-  const location = useLocation();
   const navigate = useNavigate();
 
   return (

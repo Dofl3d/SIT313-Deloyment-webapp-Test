@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Container, 
   Grid, 
@@ -7,10 +7,15 @@ import {
   Header as SemanticHeader,
   Segment,
   Dropdown,
-  Message
+  Message,
+  Icon,
+  Label
 } from 'semantic-ui-react';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import ReactMarkdown from 'react-markdown';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import { useNavigate } from 'react-router-dom';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/javascript/javascript';
@@ -30,6 +35,10 @@ const CreatePost = () => {
   const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [showCodeEditor, setShowCodeEditor] = useState(false);
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   const postTypes = [
     { key: 'article', text: 'Article', value: 'article' },
@@ -43,12 +52,86 @@ const CreatePost = () => {
     { key: 'css', text: 'CSS', value: 'css' }
   ];
 
+  const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files);
+    const codeFiles = files.filter(file => {
+      const validExtensions = ['.js', '.jsx', '.ts', '.tsx', '.py', '.html', '.css', '.java', '.cpp', '.c', '.php', '.rb', '.go'];
+      return validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+    });
+    
+    if (codeFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...codeFiles]);
+      
+      // If uploading code files, automatically read the first one
+      if (codeFiles[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setCodeContent(e.target.result);
+          setShowCodeEditor(true);
+          
+          // Auto-detect language from file extension
+          const extension = codeFiles[0].name.split('.').pop().toLowerCase();
+          const languageMap = {
+            'js': 'javascript',
+            'jsx': 'javascript',
+            'ts': 'javascript',
+            'tsx': 'javascript',
+            'py': 'python',
+            'html': 'xml',
+            'css': 'css'
+          };
+          if (languageMap[extension]) {
+            setLanguage(languageMap[extension]);
+          }
+        };
+        reader.readAsText(codeFiles[0]);
+      }
+    }
+  };
+
+  const removeFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate post creation
-    setTimeout(() => {
+    try {
+      // Prepare the post data
+      const postData = {
+        type: postType,
+        title: title.trim(),
+        description: content.trim(),
+        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        createdAt: serverTimestamp(),
+        author: 'Anonymous User', // You can replace this with actual user data
+        status: 'active'
+      };
+
+      // Add article-specific fields
+      if (postType === 'article') {
+        postData.abstract = abstract.trim();
+      }
+
+      // Add code-related fields if code is provided
+      if (showCodeEditor && codeContent && codeContent.trim() !== '// Write your code here\nconsole.log("Hello World!");') {
+        postData.code = codeContent.trim();
+        postData.language = language;
+      }
+
+      // Add uploaded files information if any
+      if (uploadedFiles.length > 0) {
+        postData.attachments = uploadedFiles.map(file => ({
+          name: file.name,
+          size: file.size,
+          type: file.type
+        }));
+      }
+
+      // Save to Firestore
+      await addDoc(collection(db, 'questions'), postData);
+      
       setLoading(false);
       setSuccess(true);
       
@@ -60,40 +143,82 @@ const CreatePost = () => {
         setContent('');
         setCodeContent('// Write your code here\nconsole.log("Hello World!");');
         setTags('');
-      }, 2000);
-    }, 1500);
+        setUploadedFiles([]);
+        setShowCodeEditor(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setLoading(false);
+      // You could add error state and show error message to user
+    }
   };
 
   const renderPreview = () => {
     return (
       <div>
         <h3>{title || 'Post Title'}</h3>
-        {abstract && (
+        <Label color="blue" size="small">{postType === 'article' ? 'Article' : 'Question'}</Label>
+        
+        {abstract && postType === 'article' && (
           <div style={{ 
             padding: '1rem', 
             backgroundColor: '#f8f9fa', 
             borderLeft: '4px solid #007bff',
-            marginBottom: '1rem'
+            margin: '1rem 0'
           }}>
             <strong>Abstract:</strong> {abstract}
           </div>
         )}
+        
         {content && (
           <div style={{ marginBottom: '1rem' }}>
-            <ReactMarkdown>{content}</ReactMarkdown>
+            {postType === 'article' ? (
+              <ReactMarkdown>{content}</ReactMarkdown>
+            ) : (
+              <div>
+                <h4>Description:</h4>
+                <p>{content}</p>
+              </div>
+            )}
           </div>
         )}
-        {postType === 'question' && codeContent && (
+        
+        {showCodeEditor && codeContent && codeContent.trim() !== '// Write your code here\nconsole.log("Hello World!");' && (
           <div>
             <h4>Code ({language}):</h4>
             <pre style={{ 
               backgroundColor: '#f5f5f5', 
               padding: '1rem', 
               borderRadius: '4px',
-              overflow: 'auto'
+              overflow: 'auto',
+              maxHeight: '300px'
             }}>
               <code>{codeContent}</code>
             </pre>
+          </div>
+        )}
+
+        {uploadedFiles.length > 0 && (
+          <div style={{ marginTop: '1rem' }}>
+            <h4>Attached Files:</h4>
+            {uploadedFiles.map((file, index) => (
+              <Label key={index} style={{ margin: '2px' }}>
+                <Icon name="file code" />
+                {file.name}
+              </Label>
+            ))}
+          </div>
+        )}
+
+        {tags && (
+          <div style={{ marginTop: '1rem' }}>
+            <h4>Tags:</h4>
+            {tags.split(',').map((tag, index) => (
+              <Label key={index} color="teal" size="small" style={{ margin: '2px' }}>
+                {tag.trim()}
+              </Label>
+            ))}
           </div>
         )}
       </div>
@@ -108,6 +233,22 @@ const CreatePost = () => {
           <Message positive size="large">
             <Message.Header>Post Created Successfully!</Message.Header>
             <p>Your {postType} has been published and is now visible to the community.</p>
+            <div style={{ marginTop: '1rem' }}>
+              <Button 
+                color="blue" 
+                onClick={() => navigate('/find-questions')}
+              >
+                <Icon name="search" />
+                View All Posts
+              </Button>
+              <Button 
+                basic 
+                onClick={() => setSuccess(false)}
+                style={{ marginLeft: '1rem' }}
+              >
+                Create Another Post
+              </Button>
+            </div>
           </Message>
         </Container>
         <Footer />
@@ -174,7 +315,62 @@ const CreatePost = () => {
                   />
                 </Form.Field>
 
-                {postType === 'question' && (
+                {/* Code Section for both articles and questions */}
+                <Form.Field>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <Button
+                      type="button"
+                      toggle
+                      active={showCodeEditor}
+                      onClick={() => setShowCodeEditor(!showCodeEditor)}
+                      icon
+                      labelPosition="left"
+                    >
+                      <Icon name="code" />
+                      {showCodeEditor ? 'Hide' : 'Add'} Code
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      icon
+                      labelPosition="left"
+                      style={{ marginLeft: '1rem' }}
+                    >
+                      <Icon name="upload" />
+                      Upload Code File
+                    </Button>
+                  </div>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept=".js,.jsx,.ts,.tsx,.py,.html,.css,.java,.cpp,.c,.php,.rb,.go"
+                    multiple
+                    style={{ display: 'none' }}
+                  />
+
+                  {uploadedFiles.length > 0 && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <Label.Group>
+                        {uploadedFiles.map((file, index) => (
+                          <Label key={index}>
+                            <Icon name="file code" />
+                            {file.name}
+                            <Icon 
+                              name="delete" 
+                              onClick={() => removeFile(index)}
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </Label>
+                        ))}
+                      </Label.Group>
+                    </div>
+                  )}
+                </Form.Field>
+
+                {showCodeEditor && (
                   <>
                     <Form.Field>
                       <label>Programming Language</label>
