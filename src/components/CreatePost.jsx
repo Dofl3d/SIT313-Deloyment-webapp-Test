@@ -14,7 +14,7 @@ import {
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import ReactMarkdown from 'react-markdown';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { findDb } from '../firebase/findConfig';
 import { useNavigate } from 'react-router-dom';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -129,8 +129,8 @@ const CreatePost = () => {
         }));
       }
 
-      // Save to Firestore
-      await addDoc(collection(db, 'questions'), postData);
+      // Save to Firestore posts collection
+      await addDoc(collection(findDb, 'posts'), postData);
       
       setLoading(false);
       setSuccess(true);

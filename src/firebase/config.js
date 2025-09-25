@@ -23,7 +23,7 @@ const app = initializeApp(firebaseConfig);
 // Export Firebase Authentication instance for user sign-in/sign-up
 export const auth = getAuth(app);
 
-// Export Firestore instance for storing user data
+// Export Firestore instance for storing user data and posts
 export const db = getFirestore(app);
 
 // Export Analytics instance (optional, for usage tracking)
